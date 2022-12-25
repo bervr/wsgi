@@ -1,7 +1,7 @@
 import datetime
 import os
 
-templates_path = os.path.join(os.getcwd(), 'templates')
+templates_path = os.path.join(os.getcwd(), '../templates')
 
 
 def log_controller(request, *args, **kwargs):

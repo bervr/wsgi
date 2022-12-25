@@ -1,6 +1,6 @@
 import os
 
-from templator import render
+from framework.templator import render
 
 templates_path = os.path.join(os.getcwd(), 'templates')
 

@@ -1,7 +1,7 @@
 import pprint
 from quopri import decodestring
 
-from http_requests import PostReq, GetReq
+from .http_requests import PostReq, GetReq
 
 
 class Page404:
