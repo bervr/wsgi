@@ -62,15 +62,7 @@ class Framework:
             result_data[k] = val_decode
         return result_data
 
-    @staticmethod
-    def save_file(data):
-        if data["method"] == "POST":
-            data_req = data["data"]
-        elif data["method"] == "GET":
-            data_req = data["request_params"]
-        if data_req:
-            with open('request_log.txt', 'a', encoding='utf-8') as file:
-                file.writelines(f'Получен {data["method"]} запрос содержащий {data_req}\n')
+
 
 
 
