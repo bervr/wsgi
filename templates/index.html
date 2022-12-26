@@ -1,30 +1,19 @@
 {% extends 'base.html' %}
 {% block title %}
-	<title>Магазин</title>
+	<title>Наши расписания</title>
 {% endblock %}
-
 {% block main %}
-		<div class="featured">
-			<div class="featured-menu">
-					<a class="active" href="#">Популярные</a><a href="#">Новинки</a>
-			</div>
-			<a class="explore" href="#">показать все <img src="arrow.png" alt=""></a>
-			{% block clearfix %}
-            <div class="clearfix">
-			</div>
-            {% endblock %}
-			<div class="tab-content">
-                {% for product in products %}
-				<div class="block">
-					<a href="#"><img src="/media/{{ product.image }}" width="270" alt="">
-						<div class="text">
-							<img src="icon-hover.png" alt="img">
-							<h4>{{ product.name }}</h4>
-							<p>{{ product.short_desc}} </p>
-						</div> 
-					</a>
-				</div>
-                {% endfor %}
-			</div>
-		</div>
+    <div>
+		<h1>Список существующих категорий</h1>
+        {% for item in objects_list %}
+        <li>
+            {{item.name}} <span>Количество курсов: {{item.course_count()}}</span>
+			<a href="/courses/?id={{item.id}}">Смотреть курс</a>
+        </li>
+        {% endfor %}
+	</div>
+    <div>
+		<a href="/addcategory/">Добавить новую категорию</a>
+	</div>
+
 {% endblock %}
