@@ -1,13 +1,6 @@
 
-<div class="header clearfix">
-    <a href="{% url '/' %}" class="logo"></a>
-    <ul class="menu">
-        <li><a href="{% url '/' %}" class="{% if request.resolver_match.route == '' %}
-                    active
-                  {% endif %}">домой</a></li>
-        <li><a href="{% url '/2/' 0 %}" class="{% if request.resolver_match.route == 'products/category/<int:pk>/' %}
-                        active
-                      {% endif %}">about</a></li>
+<ul class="menu">
+		<li><a href="/">Home</a></li>
+        <li><a href="/about/">about</a></li>
+        <li><a href="/contact/">contact us</a></li>
     </ul>
-
-</div>
