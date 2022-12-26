@@ -26,6 +26,16 @@ class ContactUs:
 
     def __call__(self, request):
         return '200 OK', render(self.page)
+class CoursesList:
+    pass
+class CategoryList:
+    pass
+class AddCourse:
+    pass
+class AddCategory:
+    pass
+class CopyCourse:
+    pass
 
 
 

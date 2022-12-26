@@ -1,5 +1,5 @@
 
-from views import HomePage, SecondPage, ContactUs
+from views import HomePage, SecondPage, ContactUs, CoursesList, CategoryList, AddCourse, AddCategory, CopyCourse
 
 routes = {
         '/': HomePage(),
