@@ -1,0 +1,1 @@
+Получен POST запрос содержащий {'name': 'wtve', 'email': 'wevt', 'text': 'wnrbeqtvwn wrh nyrwte'}

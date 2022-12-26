@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}
+	<title>Наши курсы</title>
+{% endblock %}
+
+{% block main %}
+    <div>
+        <a href="/addcourse/?id={{id}}">Создать новый курс</a>
+        <br>
+        <h1>Список курсов для категории "{{name}}"</h1>
+        {% for course in objects_list %}
+        <li>
+            {{course.name}} <span><a href="/copycourse/?name={{course.name}}">дублировать</a></span>
+        </li>
+        {% endfor %}
+    </div>
+{% endblock %}
