@@ -35,12 +35,13 @@ class Framework:
         if method == 'POST':
             data = PostReq().get_requests_params(environ)
             request['data'] = Framework.decode_values(data)
-            self.logger.log(f'Method {method} receive data {Framework.decode_values(data)}')
+            if data:
+                self.logger.log(f'Method {method} receive data {Framework.decode_values(data)}')
         if method == 'GET':
             params = GetReq().get_requests_params(environ)
             request['request_params'] = Framework.decode_values(params)
-            self.logger.log(f'Method {method} receive params {Framework.decode_values(params)}')
-
+            if params:
+                self.logger.log(f'Method {method} receive params {Framework.decode_values(params)}')
         if path in self.routes:
             view = self.routes[path]
         else:

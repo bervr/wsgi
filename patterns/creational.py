@@ -177,4 +177,4 @@ class Logger(metaclass=Singleton):
 
     def log(self, data):
         with open(f'{self.name}_log.txt', 'a', encoding='utf-8') as file:
-            file.writelines(f'{datetime.datetime.now()} - {data}')
+            file.writelines(f'{datetime.datetime.now()} - {data} \n')
