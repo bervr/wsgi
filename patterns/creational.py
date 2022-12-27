@@ -9,7 +9,7 @@ class Student:
 class Teacher:
     pass
 
-staff = types = {
+staff = {
         'student': Student,
         'teacher': Teacher
     }
@@ -33,8 +33,9 @@ class CreateFactory:
 #     def create(cls, new_type):
 #         return cls.types[new_type]()
 
-class UserFactory(CreateFactory(staff)):
+class UserFactory(CreateFactory):
     """Класс фабричный метод"""
+    types = staff
     pass
 
 
@@ -65,7 +66,7 @@ class LectureCourse(Course):
     pass
 
 
-courses = types = {
+courses = {
         'interactive': InteractiveCourse,
         'record': RecordCourse,
         'lecture': LectureCourse,
@@ -82,9 +83,10 @@ courses = types = {
 #     def create(cls, new_type, name, category):
 #         return cls.types[new_type](name, category)
 
-class CourseFactory(CreateFactory(courses)):
+class CourseFactory(CreateFactory):
     """Класс фабричный метод создания курса """
     # переопределим фабричный метод родителя, потому что у подклассов добавляется атрибуты
+    types = courses
     @classmethod
     def create(cls, new_type, name, category):
         return cls.types[new_type](name, category)
@@ -160,7 +162,7 @@ class Singleton(type):
             name = args[0]
         if kwargs:
             name = kwargs['name']
-        # если класс с таким имене есть возвращаем его, если нет, то создаем
+        # если класс с таким именем есть возвращаем его, если нет, то создаем
         if name in cls.__instance:
             return cls.__instance[name]
         else:
@@ -173,7 +175,6 @@ class Logger(metaclass=Singleton):
     def __init__(self, name):
         self.name = name
 
-    @staticmethod
-    def log(data):
-        with open(f'{Logger.name}_log.txt', 'a', encoding='utf-8') as file:
+    def log(self, data):
+        with open(f'{self.name}_log.txt', 'a', encoding='utf-8') as file:
             file.writelines(f'{datetime.datetime.now()} - {data}')

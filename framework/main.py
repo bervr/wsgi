@@ -2,6 +2,7 @@ import pprint
 from quopri import decodestring
 
 from .http_requests import PostReq, GetReq
+from patterns.creational import Logger
 
 
 class Page404:
@@ -17,6 +18,7 @@ class Framework:
     def __init__(self, routes, middleware):
         self.routes = routes
         self.controllers = middleware
+        self.logger = Logger('framework')
 
     def __call__(self, environ, start_response):
         path = environ['PATH_INFO']
@@ -33,13 +35,12 @@ class Framework:
         if method == 'POST':
             data = PostReq().get_requests_params(environ)
             request['data'] = Framework.decode_values(data)
-            print(f'получили POST {Framework.decode_values(data)}')
-            Framework.save_file(request)
+            self.logger.log(f'Method {method} receive data {Framework.decode_values(data)}')
         if method == 'GET':
             params = GetReq().get_requests_params(environ)
             request['request_params'] = Framework.decode_values(params)
-            print(f'получили GET {Framework.decode_values(params)}')
-            Framework.save_file(request)
+            self.logger.log(f'Method {method} receive params {Framework.decode_values(params)}')
+
         if path in self.routes:
             view = self.routes[path]
         else:
