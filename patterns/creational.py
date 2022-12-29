@@ -72,16 +72,6 @@ courses = {
         'lecture': LectureCourse,
     }
 
-# class CourseFactory:
-#     types = {
-#         'interactive': InteractiveCourse,
-#         'record': RecordCourse
-#     }
-#
-#     # порождающий паттерн Фабричный метод
-#     @classmethod
-#     def create(cls, new_type, name, category):
-#         return cls.types[new_type](name, category)
 
 class CourseFactory(CreateFactory):
     """Класс фабричный метод создания курса """
