@@ -21,7 +21,9 @@ class HomePage:
 
 class SecondPage:
     def __init__(self):
+
         self.page =  'second.html'
+
 
     def __call__(self, request):
         return '200 OK', render(self.page, date=request.get('date', None))
@@ -29,6 +31,7 @@ class SecondPage:
 class ContactUs:
     def __init__(self):
         self.page = 'contacts.html'
+
 
     def __call__(self, request):
         return '200 OK', render(self.page, date=request.get('date', None))
@@ -54,6 +57,7 @@ class CategoryList:
         return '200 OK', render('categories.html',
                                 objects_list=site.categories,
                                 date=request.get('date', None),)
+
 
 
 class AddCourse:
@@ -93,6 +97,7 @@ class AddCourse:
 class AddCategory:
     """Create new category from form data"""
     def __call__(self, request):
+
         if request['method'] == 'POST' and request['data']:
             data = request['data']
             name = data['category_name']
@@ -121,6 +126,7 @@ class CopyCourse:
                 new_course = course.clone()
                 new_course.name = f'copy_{name}'
                 site.courses.append(new_course)
+
 
 
             return '200 OK', render('courses.html',

@@ -20,4 +20,3 @@ def render(template_name, folder=templates_folder, **kwargs):
 
 if __name__ == "__main__":
     test = render('home_site.html') # , params=[{'username': 'Alex'}, {'city': 'Moscow'}])
-    print(test)
