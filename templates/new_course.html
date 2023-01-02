@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 {% block title %}
-
 	<title>Магазин</title>
 {% endblock %}
 
@@ -17,16 +16,11 @@
 {#			<div class="tab-content">#}
 
              <div>
-
-        <br>
-        <h1>Все курсы категории "{{name}}"</h1>
-        {% for course in objects_list %}
-        <li>
-            {{course.name}} <span><a href="/copycourse/?name={{course.name}}">скопировать</a></span>
-        </li>
-        {% endfor %}
-             <a href="/addcourse/?id={{id}}">Добавить новый курс</a>
-             <a href="/categories/">Назад в категории</a>
+         <h1>Создание курса категории "{{name}}"</h1>
+        <form method="post">
+            <input type="text" name="course_name" placeholder="Название курса">
+            <button type="submit">Сохранить</button>
+        </form>
     </div>
 
             </div>

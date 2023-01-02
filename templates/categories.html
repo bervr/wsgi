@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}
+	<title>Магазин</title>
+{% endblock %}
+
+{% block main %}
+		<div class="featured">
+			<div class="featured-menu">
+{#					<a class="active" href="#">Популярные</a><a href="#">Новинки</a>#}
+			</div>
+            <h4>Список категорий</h4>
+                <ul>
+                    {% for item in objects_list %}
+
+                        <li>
+
+                            {{item.name}} <span>Количество курсов: {{item.course_count()}}
+                        <a href="/courses/?id={{item.id}}">Курсы в категории</a>
+                        </span>
+
+                        </li>
+
+                    {% endfor %}
+                </ul>
+                <div>
+                    <li><a href="/addcategory/">Создать категорию</a></li>
+                    <li><a href="/addcourse/">Создать курс</a></li>
+                    <li><a href="/">Назад</a></li>
+                </div>
+
+            </div>
+        </div>
+{% endblock %}

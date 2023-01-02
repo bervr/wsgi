@@ -40,33 +40,37 @@
         </div>
         <div class="location-1">
             <i class="fa fa-map-marker fa-5x"></i>
-            <h4>Москва</h4>
-            <div class="contacts">
-                <h5>Телефон</h5>
-                <p>+7-888-888-8888</p>
-            </div>
-            <div class="contacts">
-                <h5>Email</h5>
-                <p>info@geekshop.ru</p>
-            </div>
-            <div class="contacts">
-                <h5>Адрес</h5>
-                <p>В пределах МКАД</p>
-            </div>
-        </div>
-    </div>
-    <h1>Напишите нам.</h1>
+
+            <h4>Напишите нам.</h4>
 		<form action="" method="post">
 			<fieldset>
+                <div class="contacts">
 				<legend>Представьтесь</legend>
-				<p><label class="title" for="name">Ваше имя:</label>
-					 <input type="text" name="name" id="name"><br />
-					 <label class="title" for="email">Ваш email:</label>
-					 <input type="text" name="email" id="email"></p>
-                      <label class="title" for="text">Ваше сообщение</label>
-					 <input type="text-block" name="text" id="text" minlength="4" maxlength="800" size="100"></p>
+                </div>
+                <div class="contacts">
+				<label  for="name">Ваше имя:</label>
+                    </div>
+                <div class="contacts">
+					 <input type="text" name="name" id="name">
+                </div>
+                <div class="contacts">
+					 <label  for="email">Ваш email:</label>
+                    </div>
+                <div class="contacts">
+					 <input type="text" name="email" id="email">
+                </div>
+                <div class="contacts">
+                      <label  for="text">Ваше сообщение</label>
+                </div>
+                <div class="contacts">
+					 <input type="text-block" name="text" id="text">
+                </div>
 			</fieldset>
- 	    <div class="submit"><input type="submit" value="отправить!" /></div>
+ 	    <div class="contacts"><input type="submit" value="отправить!" /></div>
 		</form>
+    </div>
+    </div>
+
+
 
 {% endblock %}

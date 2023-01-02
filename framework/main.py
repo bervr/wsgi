@@ -2,6 +2,7 @@ import pprint
 from quopri import decodestring
 
 from .http_requests import PostReq, GetReq
+from patterns.creational import Logger
 
 
 class Page404:
@@ -17,6 +18,7 @@ class Framework:
     def __init__(self, routes, middleware):
         self.routes = routes
         self.controllers = middleware
+        self.logger = Logger('framework')
 
     def __call__(self, environ, start_response):
         path = environ['PATH_INFO']
@@ -33,13 +35,13 @@ class Framework:
         if method == 'POST':
             data = PostReq().get_requests_params(environ)
             request['data'] = Framework.decode_values(data)
-            print(f'получили POST {Framework.decode_values(data)}')
-            Framework.save_file(request)
+            if data:
+                self.logger.log(f'Method {method} receive data {Framework.decode_values(data)}')
         if method == 'GET':
             params = GetReq().get_requests_params(environ)
             request['request_params'] = Framework.decode_values(params)
-            print(f'получили GET {Framework.decode_values(params)}')
-            Framework.save_file(request)
+            if params:
+                self.logger.log(f'Method {method} receive params {Framework.decode_values(params)}')
         if path in self.routes:
             view = self.routes[path]
         else:
@@ -62,15 +64,7 @@ class Framework:
             result_data[k] = val_decode
         return result_data
 
-    @staticmethod
-    def save_file(data):
-        if data["method"] == "POST":
-            data_req = data["data"]
-        elif data["method"] == "GET":
-            data_req = data["request_params"]
-        if data_req:
-            with open('request_log.txt', 'a', encoding='utf-8') as file:
-                file.writelines(f'Получен {data["method"]} запрос содержащий {data_req}\n')
+
 
 
 
