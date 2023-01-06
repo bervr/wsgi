@@ -1,3 +1,4 @@
+import datetime
 import os
 
 from jinja2 import FileSystemLoader
@@ -13,10 +14,17 @@ def render(template_name, folder=templates_folder, **kwargs):
     env.loader = FileSystemLoader(folder)
 
     template = env.get_template(template_name)
+    env.filters['debug'] = debug
     # with open(template, encoding='utf-8') as file:
     #     template = Template(file.read())
+    kwargs['date'] = datetime.date.today()
     return template.render(**kwargs)
+
+def debug(text):
+    print(text)
+    return ''
 
 
 if __name__ == "__main__":
-    test = render('home_site.html') # , params=[{'username': 'Alex'}, {'city': 'Moscow'}])
+    templates_path = os.path.join(os.path.dirname(os.getcwd()), 'templates')
+    test = render('index.html', templates_path ) # , params=[{'username': 'Alex'}, {'city': 'Moscow'}])

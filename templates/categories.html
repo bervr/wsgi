@@ -9,23 +9,45 @@
 {#					<a class="active" href="#">Популярные</a><a href="#">Новинки</a>#}
 			</div>
             <h4>Список категорий</h4>
-                <ul>
-                    {% for item in objects_list %}
-
+{#                <ul>#}
+{#                    {% for item in objects_list recursive %}#}
+{#                      <li>#}
+{#                          {% if item.is_category %}#}
+{#                            {{item.name}} <span>Количество курсов: {{item.course_count()}}</span>#}
+{#                          Recursive {{item}}#}
+{#                          <ul>{{ loop(item.courses)}}</ul>#}
+{#                        {% endif %}#}
+{#                      </li>#}
+{#                    {% endfor %}#}
+        <ul>
+                    {% for item in objects_list recursive%}
+                        {% if item.get_sub_category()|length>0 %}
+                            {{ loop(item.get_sub_category().pop())}}
+                            <li>
+                                Категория {{item.name}}
+                                <span>Количество курсов: {{item.course_count()}}
+                                <a href="/courses/?id={{item.id}}">Курсы в категории</a>
+                                </span>
+                            </li>
+                            </ul>
+                        {% else %}
                         <li>
-
-                            {{item.name}} <span>Количество курсов: {{item.course_count()}}
-                        <a href="/courses/?id={{item.id}}">Курсы в категории</a>
-                        </span>
-
-                        </li>
+                            Категория {{item.name}}
+                            <span>Количество курсов: {{item.course_count()}}
+                            <a href="/courses/?id={{item.id}}">Курсы в категории</a>
+                            </span>
+                        </li><ul>
+                        {% endif %}
 
                     {% endfor %}
-                </ul>
+        </ul>
+
                 <div>
-                    <li><a href="/addcategory/">Создать категорию</a></li>
-                    <li><a href="/addcourse/">Создать курс</a></li>
+                    <ul>
+                    <li><a href="/addcategory/">Создать новую категорию</a></li>
+{#                    <li><a href="/addcourse/">Создать курс</a></li>#}
                     <li><a href="/">Назад</a></li>
+                    </ul>
                 </div>
 
             </div>

@@ -9,6 +9,7 @@ class Page404:
     def __call__(self, request):
         return '404 Not Found', '<p>404 PAGE Not Found</p>'
 
+
 class Framework:
     """Основной обработчик. Используется в качестве callable функции, чтобы передать
     роуты и использовать мидлвейрс.  Т.к. application по стандарту PEP-3333 принимает только два параметра.
@@ -63,6 +64,29 @@ class Framework:
             val_decode = decodestring(val).decode('UTF-8')
             result_data[k] = val_decode
         return result_data
+
+
+class DebugModeApp(Framework):
+
+    def __init__(self, routes, middleware):
+        self.application = Framework(routes, middleware)
+        super().__init__(routes, middleware)
+
+    def __call__(self, env, start_response):
+        print('DEBUG MODE')
+        print(env)
+        return self.application(env, start_response)
+
+
+class FakeModeApp(Framework):
+
+    def __init__(self, routes, middleware):
+        self.application = Framework(routes, middleware)
+        super().__init__(routes, middleware)
+
+    def __call__(self, env, start_response):
+        start_response('200 OK', [('Content-Type', 'text/html')])
+        return [b'Hello from Fake']
 
 
 
