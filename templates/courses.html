@@ -25,8 +25,11 @@
             {{course.name}} <span><a href="/copycourse/?name={{course.name}}">скопировать</a></span>
         </li>
         {% endfor %}
-             <a href="/addcourse/?id={{id}}">Добавить новый курс</a>
-             <a href="/categories/">Назад в категории</a>
+             <ul>
+             <li><a href="/addcourse/?id={{id}}">Добавить новый курс</a></li>
+             <li><a href="/addcategory/?id={{id}}">Создать подкатегорию</a></li>
+             <li><a href="/categories/">Назад в категории</a></li>
+                 </ul>
     </div>
 
             </div>

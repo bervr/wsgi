@@ -8,47 +8,33 @@
     <h1>Список существующих категорий</h1>
 		<div class="featured">
 			<div class="featured-menu">
-
-{#					<a class="active" href="#">Популярные</a><a href="#">Новинки</a>#}
 			</div>
         <div class="tab-content">
+        <ul>
         {% for category in objects_list %}
-{#            <div class="block">#}
             <li>
                 {{category.name}} <span>Количество курсов: {{category.course_count()}}</span>
                 <a href="/courses/?id={{category.id}}">Показать курсы категории</a>
             </li>
-{#            </div>#}
         {% endfor %}
+        </ul>
         </div>
-
-{#			<a class="explore" href="#">показать все <img src="arrow.png" alt=""></a>#}
-			{% block clearfix %}
-            <div class="clearfix">
-            <div>
+<div>
                 <ul>
-                <li><a href="/addcategory/">Создать категорию</a></li>
+                <li><a href="/addcategory/">Создать новую категорию</a></li>
 
                 <li><a href="/categories/">Все категории</a></li>
                     </ul>
             </div>
-			</div>
-            {% endblock %}
 
-{#                {% for product in products %}#}
-{#				<div class="block">#}
-{#					<a href="#"><img src="/media/{{ product.image }}" width="270" alt="">#}
-{#						<div class="text">#}
-{#							<img src="icon-hover.png" alt="img">#}
-{#							<h4>{{ product.name }}</h4>#}
-{#							<p>{{ product.short_desc}} </p>#}
-{#						</div> #}
-{#					</a>#}
-{#				</div>#}
-{#                {% endfor %}#}
                 <div>
 
                 </div>
 	</div>
 		</div>
+    {% block clearfix %}
+            <div class="clearfix">
+
+			</div>
+            {% endblock %}
 {% endblock %}

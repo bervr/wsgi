@@ -84,20 +84,29 @@ class CourseFactory(CreateFactory):
 
 class Category:
     """Категория курса"""
-    category_id = 0
+    count_id = 0
 
     def __init__(self, name, category):
-        self.id = Category.category_id
-        Category.category_id += 1
+        self.id = Category.count_id
+        Category.count_id += 1
         self.name = name
         self.category = category
         self.courses = []
+        self.is_category = True
 
     def course_count(self):
         result = len(self.courses)
         if self.category:
             result += self.category.course_count()
         return result
+
+    def get_sub_category(self):
+        result = []
+        if self.category:
+            result.append(self.category.get_sub_category())
+        return result
+
+
 
 
 class Engine:
@@ -138,6 +147,8 @@ class Engine:
         val_b = bytes(val.replace('%', '=').replace("+", " "), 'UTF-8')
         val_decode_str = decodestring(val_b)
         return val_decode_str.decode('UTF-8')
+
+
 
 
 
