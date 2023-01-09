@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}
+	<title>Создать студента</title>
+{% endblock %}
+
+{% block main %}
+		<div class="featured">
+			<div class="featured-menu">
+                <h4>Создание категории</h4>
+                <form method="post">
+                <input type="text" name="category_name"  class="form-control" placeholder="Название категории"
+                     aria-label="Название категории" aria-describedby="basic-addon2">
+                <input type="hidden" name="id" value={{ parent_category_id }}> '
+                <button class="btn btn-light" type="submit">Сохранить</button>
+                </form>
+            </div>
+        </div>
+{% endblock %}

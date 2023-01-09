@@ -3,6 +3,7 @@ import os
 from framework.templator import render
 from patterns.creational import Engine, Logger
 from patterns.structural import AppRoute, Timer
+from patterns.behavior import EmailNotifier, SmsNotifier, ListView, CreateView, BaseSerializer
 site = Engine()
 logger = Logger('views')
 
@@ -151,6 +152,49 @@ class CopyCourse:
                                         )
         except KeyError:
             return '200 OK', 'Не могу создать здесь'
+
+@AppRoute(routes=routes, url='/students/')
+class StudentListView(ListView):
+    queryset = site.students
+    template_name = 'students.html'
+
+
+@AppRoute(routes=routes, url='/newstudent/')
+class StudentCreateView(CreateView):
+    template_name = 'new_student.html'
+
+    def create_obj(self, data: dict):
+        name = data['name']
+        name = site.decode_value(name)
+        new_obj = site.create_user('student', name)
+        site.students.append(new_obj)
+
+
+@AppRoute(routes=routes, url='/addstudent/')
+class AddStudentToCourseCreateView(CreateView):
+    template_name = 'add_student.html'
+
+    def get_context_data(self):
+        context = super().get_context_data()
+        context['courses'] = site.courses
+        context['students'] = site.students
+        return context
+
+    def create_obj(self, data: dict):
+        course_name = data['course_name']
+        course_name = site.decode_value(course_name)
+        course = site.get_course(course_name)
+        student_name = data['student_name']
+        student_name = site.decode_value(student_name)
+        student = site.get_student(student_name)
+        course.add_student(student)
+
+
+@AppRoute(routes=routes, url='/api/')
+class CourseApi:
+    @Timer(name='CourseApi')
+    def __call__(self, request):
+        return '200 OK', BaseSerializer(site.courses).save()
 
 
 if __name__ == "__main__":
