@@ -22,7 +22,9 @@
         <h1>Все курсы категории "{{name}}"</h1>
         {% for course in objects_list %}
         <li>
-            {{course.name}} <span><a href="/copycourse/?name={{course.name}}">скопировать</a></span>
+            {{course.name}} <span><a href="/copycourse/?name={{course.name}}">скопировать</a>
+            <a href="/editcourse/?id={{id}}&name={{course.name}}">редактировать</a>
+        </span>
         </li>
         {% endfor %}
              <ul>

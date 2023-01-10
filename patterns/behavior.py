@@ -19,12 +19,12 @@ class Subject:
 
 class SmsNotifier(Observer):
     def update(self, subject):
-        print(f'SMS-> добавлен {subject.students[-1].name}')
+        print(f'SMS-> добавлен {subject.name}')
 
 
 class EmailNotifier(Observer):
     def update(self, subject):
-        print(f'EMAIL -> добавлен {subject.students[-1].name}')
+        print(f'EMAIL -> добавлен {subject.name}')
 
 
 class BaseSerializer:
@@ -94,6 +94,26 @@ class CreateView(TemplateView):
             return self.render_template_with_context()
         else:  # если не пост - возвращаем предка с шаблоном создания
             return super().__call__(request)
+
+
+class EditView(TemplateView):
+    template_name = 'edit.html'
+
+    @staticmethod
+    def get_request_data(request):
+        return request['data']
+
+    def create_obj(self, data):
+        pass
+
+    def __call__(self, request):
+        if request['method'] == 'POST':
+            data = self.get_request_data(request)
+            self.create_obj(data)
+            return self.render_template_with_context()
+        else:  # если не пост - возвращаем предка с шаблоном создания
+            return super().__call__(request)
+
 
 
 """Strategy"""

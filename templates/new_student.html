@@ -5,14 +5,15 @@
 
 {% block main %}
 		<div class="featured">
-			<div class="featured-menu">
-                <h4>Создание категории</h4>
+            <div class="featured-menu"></div>
+                <li><a href="/students/">Список студентов</a></li>
+            <div class="input-group mb-3">
+                <h4>Создание студента</h4>
                 <form method="post">
-                <input type="text" name="category_name"  class="form-control" placeholder="Название категории"
-                     aria-label="Название категории" aria-describedby="basic-addon2">
-                <input type="hidden" name="id" value={{ parent_category_id }}> '
-                <button class="btn btn-light" type="submit">Сохранить</button>
+                    <input  class="form-control" type="text" name="name" placeholder="Имя">
+                    <button class="btn btn-light" type="submit">Сохранить</button>
                 </form>
             </div>
-        </div>
+            </div>
+
 {% endblock %}

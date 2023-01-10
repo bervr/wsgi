@@ -1,13 +1,17 @@
 import datetime
 from copy import deepcopy
 from quopri import decodestring
-from abc import abstractmethod
+
+from patterns.behavior import FileWriter, Subject
 
 class Student:
-    pass
+    def __init__(self, name):
+        self.name = name
+        self.courses = []
 
 class Teacher:
-    pass
+    def __init__(self, name):
+        self.name = name
 
 staff = {
         'student': Student,
@@ -20,18 +24,9 @@ class CreateFactory:
         cls.types = types
 
     @classmethod
-    def create(cls, new_type):
-        return cls.types[new_type]()
+    def create(cls, _type, name):
+        return cls.types[_type](name)
 
-# class UserFactory:
-#     """Класс фабричный метод"""
-#     types = {
-#         'student': Student,
-#         'teacher': Teacher
-#     }
-#     @classmethod
-#     def create(cls, new_type):
-#         return cls.types[new_type]()
 
 class UserFactory(CreateFactory):
     """Класс фабричный метод"""
@@ -41,17 +36,30 @@ class UserFactory(CreateFactory):
 
 class AbsPrototype:
     """Абстрактный класс прототип"""
-
     def clone(self):
         return deepcopy(self)
 
 
-class Course(AbsPrototype):
+class Course(AbsPrototype, Subject):
     """Класс учебный курс, наследуем от прототипа, будем клонировать"""
+    count_id  = 0
     def __init__(self, name, category):
         self.name = name
         self.category = category
         self.category.courses.append(self)
+        self.students = []
+        self.id = Course.count_id
+        Course.count_id += 1
+        super().__init__()
+
+    def __getitem__(self, item):
+        return self.students[item]
+
+    def add_student(self, student):
+        if student not in self.students and self not in student.courses:
+            self.students.append(student)
+            student.courses.append(self)
+            self.notify()
 
 
 class InteractiveCourse(Course):
@@ -119,8 +127,8 @@ class Engine:
         self.categories = []
 
     @staticmethod
-    def create_user(user_type):
-        return UserFactory.create(user_type)
+    def create_user(user_type, name):
+        return UserFactory.create(user_type, name)
 
     @staticmethod
     def create_category(name, category=None):
@@ -132,6 +140,12 @@ class Engine:
                 return category
         raise Exception(f'{id} - Нет такой категори.')
 
+    def get_course_by_id(self, id):
+        for course in self.courses:
+            if course.id == id:
+                return course
+        raise Exception(f'{id} - Нет такого курса.')
+
     @staticmethod
     def create_course(new_type, name, category):
         return CourseFactory.create(new_type, name, category)
@@ -140,6 +154,12 @@ class Engine:
         for course in self.courses:
             if course.name == name:
                 return course
+        return None
+
+    def get_student(self, name):
+        for student in self.students:
+            if student.name == name:
+                return student
         return None
 
     @staticmethod
@@ -173,9 +193,12 @@ class Singleton(type):
 
 class Logger(metaclass=Singleton):
     """Класс логгер наследуем от синглтона чтобы не плодить логеры"""
-    def __init__(self, name):
+    def __init__(self, name, writer=FileWriter()):
         self.name = name
+        self.writer = writer
 
     def log(self, data):
-        with open(f'{self.name}_log.txt', 'a', encoding='utf-8') as file:
-            file.writelines(f'{datetime.datetime.now()} - {data} \n')
+        # with open(f'{self.name}_log.txt', 'a', encoding='utf-8') as file:
+        #     file.writelines(f'{datetime.datetime.now()} - {data} \n')
+        text = f'{datetime.datetime.now()} - {data} \n'
+        self.writer.write(text)
