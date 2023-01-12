@@ -3,6 +3,7 @@ import os
 from framework.templator import render
 from patterns.creational import Engine, Logger
 from patterns.structural import AppRoute, Timer
+from patterns.behavior import EmailNotifier, SmsNotifier, ListView, CreateView, BaseSerializer
 site = Engine()
 logger = Logger('views')
 
@@ -10,17 +11,19 @@ templates_path = os.path.join(os.getcwd(), 'templates')
 routes = {}
 
 
-"""Собираем шаблоны в старницы и обрабатываем их чтобы на выходе была вся красота """
+"""Собираем шаблоны в страницы и обрабатываем их чтобы на выходе была вся красота """
 @AppRoute(routes=routes, url='/')
-class HomePage:
-    def __init__(self):
-        self.page = 'index.html'
-
-    @Timer(name='главная')
-    def __call__(self, request):
-        return '200 OK', render(self.page,
-                                objects_list=site.categories,
-        )
+class HomePage(ListView):
+    queryset = site.categories
+    template_name = 'index.html'
+    # def __init__(self):
+    #     self.page = 'index.html'
+    #
+    # @Timer(name='главная')
+    # def __call__(self, request):
+    #     return '200 OK', render(self.page,
+    #                             objects_list=site.categories,
+    #     )
 
 class SecondPage:
     def __init__(self):
@@ -74,8 +77,10 @@ class AddCourse:
         if request['method'] == 'POST' and request['data']:
             data = request['data']
             name = data['course_name']
+
             name = site.decode_value(name)
             category = None
+
             if self.category_id >= 0:
                 category = site.get_category_by_id(int(self.category_id))
                 course = site.create_course('record', name, category)
@@ -91,13 +96,70 @@ class AddCourse:
             try:
                 self.category_id = int(request['request_params']['id'])
                 category = site.get_category_by_id(int(self.category_id))
+            except KeyError as e:
+                print(f'error {e}')
+                return '200 OK', 'There are no categories for courses. You have to create it before'
+            course = ''
+            return '200 OK', render('new_course.html',
+                                    name=category.name,
+                                    id=category.id,
+                                    course=course,
+                                    )
 
-                return '200 OK', render('new_course.html',
-                                        name=category.name,
-                                        id=category.id,
-                                        )
-            except KeyError:
-                return '200 OK', 'There are no categories fo courses. You have to create it before'
+
+@AppRoute(routes=routes, url='/editcourse/')
+class EditCourse(SmsNotifier):
+    """Edit course from form data"""
+    category_id = -1
+    def __call__(self, request):
+        if request['method'] == 'POST' and request['data']:
+            data = request['data']
+            name = data['course_name']
+            new_name = data['new_name']
+            name = site.decode_value(name)
+            category = None
+            if new_name and new_name != name:
+                course = site.get_course(name)
+                site.courses.remove(course)
+                course.name = new_name
+                site.courses.append(course)
+            if self.category_id >= 0:
+                category = site.get_category_by_id(int(self.category_id))
+
+            for stutent in course.students:
+                self.update(stutent)
+
+            return '200 OK', render('courses.html',
+                                    objects_list=category.courses,
+                                    name=category.name,
+                                    id=category.id,
+                                    )
+
+        else:
+            try:
+                self.category_id = int(request['request_params']['id'])
+                category = site.get_category_by_id(int(self.category_id))
+            except KeyError as e:
+                print(f'error {e}')
+                return '200 OK', 'There are no categories for courses. You have to create it before'
+            self.course_name = ''
+            try:
+                self.course_name = request['request_params']['name']
+            except KeyError as e:
+                pass
+                # print(f'error {e}')
+                # return '200 OK', 'There is no course name. You have to create it before edit'
+            finally:
+                course = site.get_course(self.course_name) if self.course_name else ''
+                print('from create course', category, course)
+
+            return '200 OK', render('new_course.html',
+                                    name=category.name,
+                                    id=category.id,
+                                    course=course,
+                                    )
+
+
 
 
 class AddCategory:
@@ -151,6 +213,49 @@ class CopyCourse:
                                         )
         except KeyError:
             return '200 OK', 'Не могу создать здесь'
+
+@AppRoute(routes=routes, url='/students/')
+class StudentListView(ListView):
+    queryset = site.students
+    template_name = 'students.html'
+
+
+@AppRoute(routes=routes, url='/newstudent/')
+class StudentCreateView(CreateView):
+    template_name = 'new_student.html'
+
+    def create_obj(self, data: dict):
+        name = data['name']
+        name = site.decode_value(name)
+        new_obj = site.create_user('student', name)
+        site.students.append(new_obj)
+
+
+@AppRoute(routes=routes, url='/addstudent/')
+class AddStudentToCourseCreateView(CreateView):
+    template_name = 'add_student.html'
+
+    def get_context_data(self):
+        context = super().get_context_data()
+        context['courses'] = site.courses
+        context['students'] = site.students
+        return context
+
+    def create_obj(self, data: dict):
+        course_name = data['course_name']
+        course_name = site.decode_value(course_name)
+        course = site.get_course(course_name)
+        student_name = data['student_name']
+        student_name = site.decode_value(student_name)
+        student = site.get_student(student_name)
+        course.add_student(student)
+
+
+@AppRoute(routes=routes, url='/api/')
+class CourseApi:
+    @Timer(name='CourseApi')
+    def __call__(self, request):
+        return '200 OK', BaseSerializer(site.courses).save()
 
 
 if __name__ == "__main__":

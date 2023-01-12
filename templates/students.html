@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}
+
+	<title>Магазин</title>
+{% endblock %}
+
+{% block main %}
+		<div class="featured">
+{#             <div>#}
+{#        <br>#}
+{#        <h1>Все курсы категории "{{name}}"</h1>#}
+{#        {% for course in objects_list %}#}
+{#        <li>#}
+{#            {{course.name}} <span><a href="/copycourse/?name={{course.name}}">скопировать</a></span>#}
+{#        </li>#}
+{#        {% endfor %}#}
+{#             <ul>#}
+{#             <li><a href="/addcourse/?id={{id}}">Добавить новый курс</a></li>#}
+{#             <li><a href="/addcategory/?id={{id}}">Создать подкатегорию</a></li>#}
+{#             <li><a href="/categories/">Назад в категории</a></li>#}
+{#                 </ul>#}
+{#    </div>#}
+{##}
+{#            </div>#}
+        <ul>
+		<li><a href="/newstudent/">Создать студента</a></li>
+		<li><a href="/addstudent/">Добавить студента на курс</a></li>
+	    </ul>
+    <h4>Список студентов</h4>
+    <div>
+    <ul>
+        {% for item in objects_list %}
+        <li>
+            {{item.name}}
+            {% for course in item.courses %}
+                {{course.name}}
+            {% endfor %}
+        </li>
+        {% endfor %}
+    </ul>
+    </div>
+        </div>
+{% endblock %}
