@@ -1,22 +1,32 @@
 import datetime
 from copy import deepcopy
 from quopri import decodestring
+from sqlite3 import connect
 
 from patterns.behavior import FileWriter, Subject
+from patterns.architectural import DomainObject
 
-class Student:
+class User:
     def __init__(self, name):
         self.name = name
+
+
+class Student(User, DomainObject):
+    def __init__(self, name):
         self.courses = []
+        super().__init__(name)
 
-class Teacher:
+
+class Teacher(User, DomainObject):
     def __init__(self, name):
-        self.name = name
+        super().__init__(name)
+
 
 staff = {
         'student': Student,
         'teacher': Teacher
     }
+
 
 class CreateFactory:
     """Абстрактный класс фабричный метод"""
@@ -115,8 +125,6 @@ class Category:
         return result
 
 
-
-
 class Engine:
     """Класс-движок"""
     def __init__(self):
@@ -169,9 +177,6 @@ class Engine:
         return val_decode_str.decode('UTF-8')
 
 
-
-
-
 class Singleton(type):
     """Класс синглтон"""
     def __init__(cls, name, bases, attrs, **kwargs):
@@ -202,3 +207,122 @@ class Logger(metaclass=Singleton):
         #     file.writelines(f'{datetime.datetime.now()} - {data} \n')
         text = f'{datetime.datetime.now()} - {data} \n'
         self.writer.write(text)
+
+
+class BaseMapper:
+    """
+    Маппер для таблицы базы данных
+    """
+    def __init__(self, connection, tablename, obj_cls):
+        self.connection = connection
+        self.cursor = connection.cursor()
+        self.tablename = tablename
+        self.obj = obj_cls
+
+    def all(self):
+        statement = f'SELECT * from {self.tablename}'
+        self.cursor.execute(statement)
+        result = []
+        for item in self.cursor.fetchall():
+            id, name = item
+            item_obj = self.obj(name)
+            item_obj.id = id
+            result.append(item_obj)
+            # student = Student(name)
+            # student.id = id
+            # result.append(student)
+        return result
+
+    def find_by_id(self, id):
+        statement = f"SELECT id, name FROM {self.tablename} WHERE id=?"
+        self.cursor.execute(statement, (id,))
+        result = self.cursor.fetchone()
+        if result:
+            return self.obj(*result)
+        else:
+            raise RecordNotFoundException(f'record with id={id} not found')
+
+    def insert(self, obj):
+        statement = f"INSERT INTO {self.tablename} (name) VALUES (?)"
+        self.cursor.execute(statement, (obj.name,))
+        try:
+            self.connection.commit()
+        except Exception as e:
+            raise DbCommitException(e.args)
+
+    def update(self, obj):
+        statement = f"UPDATE {self.tablename} SET name=? WHERE id=?"
+
+        self.cursor.execute(statement, (obj.name, obj.id))
+        try:
+            self.connection.commit()
+        except Exception as e:
+            raise DbUpdateException(e.args)
+
+    def delete(self, obj):
+        statement = f"DELETE FROM {self.tablename} WHERE id=?"
+        self.cursor.execute(statement, (obj.id,))
+        try:
+            self.connection.commit()
+        except Exception as e:
+            raise DbDeleteException(e.args)
+
+
+class StudentMapper(BaseMapper):
+    def __init__(self, connection):
+        super().__init__(connection, 'student', Student)
+
+
+class CourseMapper(BaseMapper):
+    def __init__(self, connection):
+        super().__init__(connection, 'course', Course)
+
+
+class CategoryMapper(BaseMapper):
+    def __init__(self, connection):
+        super().__init__(connection, 'category', Category)
+
+
+
+connection = connect('wsgi_db.sqlite')
+
+
+class MapperRegistry:
+    """ архитектурный системный паттерн - Data Mapper """
+    mappers = {
+        'student': StudentMapper,
+        'category': CategoryMapper,
+        'course': CourseMapper,
+    }
+
+    @staticmethod
+    def get_mapper(obj):
+
+        if isinstance(obj, Student):
+            return StudentMapper(connection)
+
+    @staticmethod
+    def get_current_mapper(name):
+        return MapperRegistry.mappers[name](connection)
+
+
+class DbCommitException(Exception):
+    def __init__(self, message):
+        super().__init__(f'Db commit error: {message}')
+
+
+class DbUpdateException(Exception):
+    def __init__(self, message):
+        super().__init__(f'Db update error: {message}')
+
+
+class DbDeleteException(Exception):
+    def __init__(self, message):
+        super().__init__(f'Db delete error: {message}')
+
+
+class RecordNotFoundException(Exception):
+    def __init__(self, message):
+        super().__init__(f'Record not found: {message}')
+
+
