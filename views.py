@@ -1,11 +1,14 @@
 import os
 
 from framework.templator import render
-from patterns.creational import Engine, Logger
+from patterns.architectural import UnitOfWork
+from patterns.creational import Engine, Logger, MapperRegistry
 from patterns.structural import AppRoute, Timer
 from patterns.behavior import EmailNotifier, SmsNotifier, ListView, CreateView, BaseSerializer
 site = Engine()
 logger = Logger('views')
+UnitOfWork.new_current()
+UnitOfWork.get_current().set_mapper_registry(MapperRegistry)
 
 templates_path = os.path.join(os.getcwd(), 'templates')
 routes = {}
@@ -25,6 +28,7 @@ class HomePage(ListView):
     #                             objects_list=site.categories,
     #     )
 
+
 class SecondPage:
     def __init__(self):
 
@@ -35,6 +39,7 @@ class SecondPage:
         return '200 OK', render(self.page,
                                 )
 
+
 class ContactUs:
     def __init__(self):
         self.page = 'contacts.html'
@@ -43,30 +48,42 @@ class ContactUs:
     def __call__(self, request):
         return '200 OK', render(self.page,
                                 )
-class CoursesList:
-    @Timer(name='Список курсов')
-    def __call__(self, request):
-        # logger.log('Запрос списка курсов')
-        try:
-            category = site.get_category_by_id(
-                int(request['request_params']['id']))
-            return '200 OK', render('courses.html',
-                                    objects_list=category.courses,
-                                    name=category.name,
-                                    id=category.id,
-                                    )
-        except KeyError:
-            return '200 OK', 'There are no courses here'
+
+
+class CoursesList(ListView):
+    # @Timer(name='Список курсов')
+    # def __call__(self, request):
+    #     # logger.log('Запрос списка курсов')
+    #     try:
+    #         category = site.get_category_by_id(
+    #             int(request['request_params']['id']))
+    #         return '200 OK', render('courses.html',
+    #                                 objects_list=category.courses,
+    #                                 name=category.name,
+    #                                 id=category.id,
+    #                                 )
+    #     except KeyError:
+    #         return '200 OK', 'There are no courses here'
+    template_name = 'courses.html'
+
+    def get_queryset(self):
+        mapper = MapperRegistry.get_current_mapper('course')
+        return mapper.all()
+
 
 @AppRoute(routes=routes, url='/categories/')
-class CategoryList:
-    @Timer(name='список категорий')
-    def __call__(self, request):
-        # logger.log('Получаем список категорий')
-        return '200 OK', render('categories.html',
-                                objects_list=site.categories,
-                                )
+class CategoryList(ListView):
+    # @Timer(name='список категорий')
+    # def __call__(self, request):
+    #     # logger.log('Получаем список категорий')
+    #     return '200 OK', render('categories.html',
+    #                             objects_list=site.categories,
+    #                             )
+    template_name = 'categories.html'
 
+    def get_queryset(self):
+        mapper = MapperRegistry.get_current_mapper('category')
+        return mapper.all()
 
 
 class AddCourse:
@@ -160,10 +177,10 @@ class EditCourse(SmsNotifier):
                                     )
 
 
-
-
-class AddCategory:
+class AddCategory(CreateView):
     """Create new category from form data"""
+    template_name = 'new_category.html'
+
     def __call__(self, request):
 
         if request['method'] == 'POST' and request['data']:
@@ -183,12 +200,13 @@ class AddCategory:
             return '200 OK', render('index.html', objects_list=site.categories,
                                     )
         else:
-            categories = site.categories
-            category = request['request_params']['id'] if request['request_params'].get('id') else -1
-            return '200 OK', render('new_category.html',
-                                    categories=categories,
-                                    parent_category_id=category,
-                                    )
+            return super().__call__(request)
+            # categories = site.categories
+            # category = request['request_params']['id'] if request['request_params'].get('id') else -1
+            # return '200 OK', render('new_category.html',
+            #                         categories=categories,
+            #                         parent_category_id=category,
+            #                         )
 
 
 class CopyCourse:
@@ -214,10 +232,14 @@ class CopyCourse:
         except KeyError:
             return '200 OK', 'Не могу создать здесь'
 
+
 @AppRoute(routes=routes, url='/students/')
 class StudentListView(ListView):
-    queryset = site.students
     template_name = 'students.html'
+
+    def get_queryset(self):
+        mapper = MapperRegistry.get_current_mapper('student')
+        return mapper.all()
 
 
 @AppRoute(routes=routes, url='/newstudent/')
@@ -229,6 +251,8 @@ class StudentCreateView(CreateView):
         name = site.decode_value(name)
         new_obj = site.create_user('student', name)
         site.students.append(new_obj)
+        new_obj.mark_new()
+        UnitOfWork.get_current().commit()
 
 
 @AppRoute(routes=routes, url='/addstudent/')
@@ -238,7 +262,7 @@ class AddStudentToCourseCreateView(CreateView):
     def get_context_data(self):
         context = super().get_context_data()
         context['courses'] = site.courses
-        context['students'] = site.students
+        context['students'] = MapperRegistry.get_current_mapper('student').all()
         return context
 
     def create_obj(self, data: dict):
